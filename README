@@ -1,0 +1,45 @@
+Usage:
+
+-Have node.js version v0.12.7 or newer
+-run npm install in root of downloaded folder
+-To use program, type in commands like this:
+    CreditCardProcessing ./TestCases/checkValidCardNumbersTest
+    CreditCardProcessing ./TestCases/largeTest
+    CreditCardProcessing ./TestCases/mixedCommands
+    CreditCardProcessing ./TestCases/givenExampleTest
+    CreditCardProcessing ./TestCases/checkInvalidCardNumbersTest
+-command name is CreditCardProcessing and the second argument is the name of testfile.
+
+Some assumptions my program makes:
+
+-If trying to add same name that is already in memory, then ignore. This assumption came about because the output only says
+ name: balance. Thus, there is no real way to distinguish between people with the same name even though there is a possibility that two people can have the same
+ name. So if two different Tim's were added to the system, the output would spit out both Tim's without differentiating them. Additionally, charging and adding input would be ambiguous to which person to do the action to. This can be solved easily by just
+ outputting the card number of the person along with their name or replace the name with the card number (credit card numbers can act as key since credit cards numbers are never assigned
+ to more than one person) when outputting and putting in credit/charge commands. This would make it not ambiguous. I didn't want to change the format of input/output of your challenge. Because of this, I made the system only able to
+ contain no more than one of the same name to avoid ambiguity in the output. Realistically, this is impractical but it wasn't clear if I could change how input and output appear in the dev challenge.
+-The max number an integer in javascript can represent is from -(2^53 - 1) to 2^53 - 1, so I'm assuming no single person will ever exceed that amount in credit or debits because that is over 1000 billion.
+-charges and credits to non existing accounts are ignored.
+
+Overview of Design Decisions:
+
+The challenge itself seems simple enough and without over complicating things, I had a CreditCard class that would contain the data for the respective persons card. It made
+sense to add in the charge(), credit(), and luhn10 authentication method in that class because of organization. My program reads in a file with commands, parses through the commands
+to distinguish between different commands and their arguments, and simply uses a switch statement to execute the code necessary for each command. For simplicity's sake, I used a associative array to
+map the names to its respective CreditCard Object for quick access. When a CreditCard object is created, the person name is also added to a list that is later sorted
+at the end of processing the file. Rather than continuously sort it each iteration, I just sort before I print the output so names are alphabetical.
+I used node.js because I envisioned this program to be some app on a server. Since all the operations are not cpu intensive, node.js seems perfect for it
+because of its handling of asynchronous i/o and single threaded event loop makes it so that this app could handle large amounts of requests and scale pretty well
+since i/o is nonblocking. Ideally, if the program task was to be expanded then commands would use restful services to create, credit, and charge cards
+with a database in the backend to store data.
+
+What my program does in specific test cases/edge cases:
+
+givenExampleTest: tests the given example
+checkValidCardNumbersTest: Got a list of luhn10 valid card numbers online and checked to see if they all passed.
+        -also checked to see if it ignored charging someone over their limit
+        -also checked to see if credits could go negative
+checkInvalidCardNumbersTest: Used the same credit card numbers from checkValidCardNumbersTest except I randomly changed chose a index to change in each
+    card number so that means it should fails Luhn's check.
+mixedCommands: checked both invalid and valid card accounts and charging/credits to non existing accounts
+largeTest: This one has over 1000 commands and the program still runs fast.
